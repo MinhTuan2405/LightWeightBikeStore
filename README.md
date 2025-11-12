@@ -124,3 +124,12 @@ Nếu bạn muốn, tôi có thể:
 - Tạo `CONTRIBUTING.md` và mẫu workflow CI
 
 Chỉ cần cho tôi biết bạn muốn thêm chi tiết nào nữa.
+
+
+| Mục                      | Bảng liên quan               | Chức năng                               |
+| ------------------------ | ---------------------------- | --------------------------------------- |
+| Product Management       | categories, brands, products | Quản lý danh mục, thương hiệu, sản phẩm |
+| Customer Management      | customers                    | Quản lý thông tin khách hàng            |
+| Store & Staff Management | stores, staffs               | Quản lý cửa hàng, nhân viên             |
+| Order Management         | orders, order_items          | Quản lý đơn hàng và chi tiết đơn hàng   |
+| Inventory Management     | stocks                       | Quản lý tồn kho theo store              |
