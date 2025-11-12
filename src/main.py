@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 app = FastAPI(
     title="Bike Store Management",
     version="0.1.0",
-    description="API backend cho BikestoreShop",
+    description="API backend for Bike Store",
 )
 
 origins = ["*"]
