@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from sys import prefix
+from fastapi import FastAPI, APIRouter
+from fastapi.background import P
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 
 
 
@@ -21,15 +24,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+default_route = APIRouter (
+    tags=['DEAFAULT']
+)
 
-@app.get("/", response_class=JSONResponse)
+
+@default_route.get("/", response_class=JSONResponse)
 def read_root():
     return {"message": "BikestoreShop API", "status": "ok"}
 
 
-@app.get("/health", response_class=JSONResponse)
+@default_route.get("/health", response_class=JSONResponse)
 def health_check():
     return {"status": "ok"}
+
+
+app.include_router (default_route)
 
 
 if __name__ == "__main__":
