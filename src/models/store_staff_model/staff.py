@@ -8,6 +8,7 @@ class Staff(Base):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
+    password_hash = Column (String, nullable=False, unique=True)
     phone = Column(String(25))
     active = Column(Boolean, nullable=False)
     store_id = Column(Integer, ForeignKey("stores.store_id"), nullable=False)

@@ -13,3 +13,5 @@ class Customer(Base):
     city = Column(String(50))
     state = Column(String(25))
     zip_code = Column(String(5))
+
+

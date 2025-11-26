@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 default_route = APIRouter (
-    tags=['DEAFAULT']
+    tags=['DEFAULT']
 )
 
 
