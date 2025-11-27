@@ -10,5 +10,4 @@ class Order(Base):
     order_date = Column(Date, nullable=False)
     required_date = Column(Date, nullable=False)
     shipped_date = Column(Date)
-    store_id = Column(Integer, ForeignKey("stores.store_id"), nullable=False)
     staff_id = Column(Integer, ForeignKey("staffs.staff_id"), nullable=False)
