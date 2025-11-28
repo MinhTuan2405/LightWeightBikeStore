@@ -23,7 +23,6 @@ from models.category import Category
 from models.product import Product
 from models.order import Order
 from models.order_item import OrderItem
-from models.stock import Stock
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

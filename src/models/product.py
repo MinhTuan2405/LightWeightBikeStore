@@ -10,3 +10,4 @@ class Product(Base):
     category_id = Column(Integer, ForeignKey("categories.category_id"), nullable=False)
     model_year = Column(SmallInteger, nullable=False)
     list_price = Column(Numeric(10, 2), nullable=False)
+    stock = Column(Integer, default=0)  # So luong hang con trong kho
