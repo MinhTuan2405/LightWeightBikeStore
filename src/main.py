@@ -1,7 +1,15 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from routers import auth_routers
+from routers import (
+    auth_routers,
+    product_routers,
+    brand_routers,
+    category_routers,
+    customer_routers,
+    order_routers,
+    staff_routers
+)
 
 app = FastAPI(
     title="LightWeight Bike Store API",
@@ -28,10 +36,14 @@ def read_root():
     return {
         "message": "LightWeight Bike Store API v2.0",
         "docs": "/docs",
-        "authentication": {
-            "register": "POST /api/auth/register",
-            "login": "POST /api/auth/login",
-            "me": "GET /api/auth/me"
+        "endpoints": {
+            "auth": "/api/auth",
+            "products": "/api/products",
+            "brands": "/api/brands",
+            "categories": "/api/categories",
+            "customers": "/api/customers",
+            "orders": "/api/orders",
+            "staffs": "/api/staffs"
         }
     }
 
@@ -42,6 +54,12 @@ def health_check():
 # Include routers
 app.include_router(default_route)
 app.include_router(auth_routers.router)
+app.include_router(product_routers.router)
+app.include_router(brand_routers.router)
+app.include_router(category_routers.router)
+app.include_router(customer_routers.router)
+app.include_router(order_routers.router)
+app.include_router(staff_routers.router)
 
 if __name__ == "__main__":
     import uvicorn

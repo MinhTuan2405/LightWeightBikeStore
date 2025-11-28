@@ -40,11 +40,12 @@ class AuthService:
             db.commit()
             db.refresh(new_staff)
             return new_staff
-        except IntegrityError:
+        except IntegrityError as e:
             db.rollback()
+            print(f"IntegrityError: {e}")  # Log để debug
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Database integrity error"
+                detail=f"Database integrity error: {str(e.orig)}"
             )
     
     @staticmethod
