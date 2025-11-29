@@ -92,6 +92,41 @@
 | PUT    | `/api/staffs/{id}` | Cập nhật staff       |
 | DELETE | `/api/staffs/{id}` | Xóa staff            |
 
+### 9. Statistics (Thống kê)
+
+#### 9.1 Staff Statistics
+
+| Method | Endpoint                                     | Mô tả                                |
+| ------ | -------------------------------------------- | ------------------------------------ |
+| GET    | `/api/statistics/staffs/count`               | Số lượng nhân viên (active/inactive) |
+| GET    | `/api/statistics/staffs/sales`               | Doanh số tất cả nhân viên            |
+| GET    | `/api/statistics/staffs/{id}/sales`          | Doanh số 1 nhân viên                 |
+| GET    | `/api/statistics/staffs/{id}/sales/by-month` | Doanh số nhân viên theo tháng        |
+| GET    | `/api/statistics/staffs/{id}/sales/by-day`   | Doanh số nhân viên theo ngày         |
+
+#### 9.2 Store Statistics
+
+| Method | Endpoint                                 | Mô tả               |
+| ------ | ---------------------------------------- | ------------------- |
+| GET    | `/api/statistics/store/overview`         | Tổng quan cửa hàng  |
+| GET    | `/api/statistics/store/sales/by-day`     | Doanh số theo ngày  |
+| GET    | `/api/statistics/store/sales/by-month`   | Doanh số theo tháng |
+| GET    | `/api/statistics/store/sales/by-quarter` | Doanh số theo quý   |
+| GET    | `/api/statistics/store/sales/by-year`    | Doanh số theo năm   |
+
+#### 9.3 Product Statistics
+
+| Method | Endpoint                               | Mô tả                 |
+| ------ | -------------------------------------- | --------------------- |
+| GET    | `/api/statistics/products/top-selling` | Top sản phẩm bán chạy |
+
+#### 9.4 Customer Statistics
+
+| Method | Endpoint                                   | Mô tả                         |
+| ------ | ------------------------------------------ | ----------------------------- |
+| GET    | `/api/statistics/customers/top-buyers`     | Top khách hàng mua nhiều nhất |
+| GET    | `/api/statistics/customers/highest-orders` | Danh sách đơn hàng cao nhất   |
+
 ---
 
-**Tổng cộng: 35 APIs**
+**Tổng cộng: 50 APIs**
