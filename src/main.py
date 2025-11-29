@@ -8,7 +8,8 @@ from routers import (
     category_routers,
     customer_routers,
     order_routers,
-    staff_routers
+    staff_routers,
+    statistics_routers
 )
 
 app = FastAPI(
@@ -43,7 +44,8 @@ def read_root():
             "categories": "/api/categories",
             "customers": "/api/customers",
             "orders": "/api/orders",
-            "staffs": "/api/staffs"
+            "staffs": "/api/staffs",
+            "statistics": "/api/statistics"
         }
     }
 
@@ -60,6 +62,7 @@ app.include_router(category_routers.router)
 app.include_router(customer_routers.router)
 app.include_router(order_routers.router)
 app.include_router(staff_routers.router)
+app.include_router(statistics_routers.router)
 
 if __name__ == "__main__":
     import uvicorn

@@ -200,6 +200,52 @@ def test_all():
     r = requests.get(f"{BASE_URL}/api/staffs/1", headers=headers)
     print_result("GET /api/staffs/1", r)
     
+    # ==================== STATISTICS ====================
+    print("\n📊 STATISTICS APIs")
+    
+    # Staff statistics
+    r = requests.get(f"{BASE_URL}/api/statistics/staffs/count", headers=headers)
+    print_result("GET /api/statistics/staffs/count", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/staffs/sales", headers=headers)
+    print_result("GET /api/statistics/staffs/sales", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/staffs/1/sales", headers=headers)
+    print_result("GET /api/statistics/staffs/1/sales", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/staffs/1/sales/by-month?year=2024", headers=headers)
+    print_result("GET /api/statistics/staffs/1/sales/by-month", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/staffs/1/sales/by-day?start_date=2024-01-01&end_date=2024-12-31", headers=headers)
+    print_result("GET /api/statistics/staffs/1/sales/by-day", r)
+    
+    # Store statistics
+    r = requests.get(f"{BASE_URL}/api/statistics/store/overview", headers=headers)
+    print_result("GET /api/statistics/store/overview", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/store/sales/by-day?start_date=2024-01-01&end_date=2024-12-31", headers=headers)
+    print_result("GET /api/statistics/store/sales/by-day", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/store/sales/by-month?year=2024", headers=headers)
+    print_result("GET /api/statistics/store/sales/by-month", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/store/sales/by-quarter?year=2024", headers=headers)
+    print_result("GET /api/statistics/store/sales/by-quarter", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/store/sales/by-year", headers=headers)
+    print_result("GET /api/statistics/store/sales/by-year", r)
+    
+    # Product statistics
+    r = requests.get(f"{BASE_URL}/api/statistics/products/top-selling?limit=10", headers=headers)
+    print_result("GET /api/statistics/products/top-selling", r)
+    
+    # Customer statistics
+    r = requests.get(f"{BASE_URL}/api/statistics/customers/top-buyers?limit=10", headers=headers)
+    print_result("GET /api/statistics/customers/top-buyers", r)
+    
+    r = requests.get(f"{BASE_URL}/api/statistics/customers/highest-orders?limit=10", headers=headers)
+    print_result("GET /api/statistics/customers/highest-orders", r)
+    
     # Cleanup - xóa test user
     print("\n🧹 CLEANUP")
     r = requests.post(f"{BASE_URL}/api/auth/login", json={
