@@ -8,6 +8,7 @@ from models.category import Category
 from schemas.product import ProductCreate, ProductUpdate, ProductResponse
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
+from services.product_service import ProductService
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
@@ -20,22 +21,12 @@ def get_products(
     db: Session = Depends(get_db)
 ):
     """Lấy danh sách sản phẩm (có filter và pagination)"""
-    query = db.query(Product)
-    
-    if brand_id:
-        query = query.filter(Product.brand_id == brand_id)
-    if category_id:
-        query = query.filter(Product.category_id == category_id)
-    
-    return query.offset(skip).limit(limit).all()
+    return ProductService.get_products(db, skip, limit, brand_id, category_id)
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_product(product_id: int, db: Session = Depends(get_db)):
     """Lấy chi tiết sản phẩm theo ID"""
-    product = db.query(Product).filter(Product.product_id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return product
+    return ProductService.get_product_by_id(db, product_id)
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 def create_product(
@@ -44,21 +35,7 @@ def create_product(
     current_user: Staff = Depends(require_admin)
 ):
     """Tạo sản phẩm mới (Admin only)"""
-    # Kiểm tra brand tồn tại
-    brand = db.query(Brand).filter(Brand.brand_id == request.brand_id).first()
-    if not brand:
-        raise HTTPException(status_code=400, detail="Brand not found")
-    
-    # Kiểm tra category tồn tại
-    category = db.query(Category).filter(Category.category_id == request.category_id).first()
-    if not category:
-        raise HTTPException(status_code=400, detail="Category not found")
-    
-    product = Product(**request.model_dump())
-    db.add(product)
-    db.commit()
-    db.refresh(product)
-    return product
+    return ProductService.create_product(db, request)
 
 @router.put("/{product_id}", response_model=ProductResponse)
 def update_product(
@@ -68,17 +45,7 @@ def update_product(
     current_user: Staff = Depends(require_admin)
 ):
     """Cập nhật sản phẩm (Admin only)"""
-    product = db.query(Product).filter(Product.product_id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    update_data = request.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(product, key, value)
-    
-    db.commit()
-    db.refresh(product)
-    return product
+    return ProductService.update_product(db, product_id, request)
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
@@ -87,10 +54,5 @@ def delete_product(
     current_user: Staff = Depends(require_admin)
 ):
     """Xóa sản phẩm (Admin only)"""
-    product = db.query(Product).filter(Product.product_id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    db.delete(product)
-    db.commit()
+    ProductService.delete_product(db, product_id)
     return None

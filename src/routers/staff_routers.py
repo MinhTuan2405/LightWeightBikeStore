@@ -5,6 +5,7 @@ from core.database import get_db
 from models.staff import Staff
 from schemas.staff import StaffUpdate, StaffListResponse
 from middleware.auth import get_current_user, require_admin
+from services.staff_service import StaffService
 
 router = APIRouter(prefix="/api/staffs", tags=["Staffs"])
 
@@ -16,7 +17,7 @@ def get_staffs(
     current_user: Staff = Depends(require_admin)
 ):
     """Lấy danh sách staffs (Admin only)"""
-    return db.query(Staff).offset(skip).limit(limit).all()
+    return StaffService.get_staffs(db, skip, limit)
 
 @router.get("/{staff_id}", response_model=StaffListResponse)
 def get_staff(
@@ -25,10 +26,7 @@ def get_staff(
     current_user: Staff = Depends(require_admin)
 ):
     """Lấy chi tiết staff theo ID (Admin only)"""
-    staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
-    if not staff:
-        raise HTTPException(status_code=404, detail="Staff not found")
-    return staff
+    return StaffService.get_staff_by_id(db, staff_id)
 
 @router.put("/{staff_id}", response_model=StaffListResponse)
 def update_staff(
@@ -38,17 +36,7 @@ def update_staff(
     current_user: Staff = Depends(require_admin)
 ):
     """Cập nhật staff (Admin only)"""
-    staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
-    if not staff:
-        raise HTTPException(status_code=404, detail="Staff not found")
-    
-    update_data = request.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(staff, key, value)
-    
-    db.commit()
-    db.refresh(staff)
-    return staff
+    return StaffService.update_staff(db, staff_id, request)
 
 @router.delete("/{staff_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_staff(
@@ -57,14 +45,5 @@ def delete_staff(
     current_user: Staff = Depends(require_admin)
 ):
     """Xóa staff (Admin only)"""
-    staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
-    if not staff:
-        raise HTTPException(status_code=404, detail="Staff not found")
-    
-    # Không cho phép xóa chính mình
-    if staff.staff_id == current_user.staff_id:
-        raise HTTPException(status_code=400, detail="Cannot delete yourself")
-    
-    db.delete(staff)
-    db.commit()
+    StaffService.delete_staff(db, staff_id, current_user.staff_id)
     return None

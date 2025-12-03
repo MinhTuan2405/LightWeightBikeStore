@@ -6,6 +6,7 @@ from models.category import Category
 from schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
+from services.category_service import CategoryService
 
 router = APIRouter(prefix="/api/categories", tags=["Categories"])
 
@@ -16,15 +17,12 @@ def get_categories(
     db: Session = Depends(get_db)
 ):
     """Lấy danh sách categories"""
-    return db.query(Category).offset(skip).limit(limit).all()
+    return CategoryService.get_categories(db, skip, limit)
 
 @router.get("/{category_id}", response_model=CategoryResponse)
 def get_category(category_id: int, db: Session = Depends(get_db)):
     """Lấy chi tiết category theo ID"""
-    category = db.query(Category).filter(Category.category_id == category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return category
+    return CategoryService.get_category_by_id(db, category_id)
 
 @router.post("", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
 def create_category(
@@ -33,11 +31,7 @@ def create_category(
     current_user: Staff = Depends(require_admin)
 ):
     """Tạo category mới (Admin only)"""
-    category = Category(**request.model_dump())
-    db.add(category)
-    db.commit()
-    db.refresh(category)
-    return category
+    return CategoryService.create_category(db, request)
 
 @router.put("/{category_id}", response_model=CategoryResponse)
 def update_category(
@@ -47,17 +41,7 @@ def update_category(
     current_user: Staff = Depends(require_admin)
 ):
     """Cập nhật category (Admin only)"""
-    category = db.query(Category).filter(Category.category_id == category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    
-    update_data = request.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(category, key, value)
-    
-    db.commit()
-    db.refresh(category)
-    return category
+    return CategoryService.update_category(db, category_id, request)
 
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(
@@ -66,10 +50,5 @@ def delete_category(
     current_user: Staff = Depends(require_admin)
 ):
     """Xóa category (Admin only)"""
-    category = db.query(Category).filter(Category.category_id == category_id).first()
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    
-    db.delete(category)
-    db.commit()
+    CategoryService.delete_category(db, category_id)
     return None

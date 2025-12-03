@@ -6,6 +6,7 @@ from models.customer import Customer
 from schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
+from services.customer_service import CustomerService
 
 router = APIRouter(prefix="/api/customers", tags=["Customers"])
 
@@ -19,14 +20,7 @@ def get_customers(
     current_user: Staff = Depends(get_current_user)
 ):
     """Lấy danh sách customers (Yêu cầu đăng nhập)"""
-    query = db.query(Customer)
-    
-    if city:
-        query = query.filter(Customer.city == city)
-    if state:
-        query = query.filter(Customer.state == state)
-    
-    return query.offset(skip).limit(limit).all()
+    return CustomerService.get_customers(db, skip, limit, city, state)
 
 @router.get("/{customer_id}", response_model=CustomerResponse)
 def get_customer(
@@ -35,10 +29,7 @@ def get_customer(
     current_user: Staff = Depends(get_current_user)
 ):
     """Lấy chi tiết customer theo ID"""
-    customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
-    if not customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    return customer
+    return CustomerService.get_customer_by_id(db, customer_id)
 
 @router.post("", response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
 def create_customer(
@@ -47,16 +38,7 @@ def create_customer(
     current_user: Staff = Depends(get_current_user)
 ):
     """Tạo customer mới"""
-    # Kiểm tra email đã tồn tại
-    existing = db.query(Customer).filter(Customer.email == request.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    customer = Customer(**request.model_dump())
-    db.add(customer)
-    db.commit()
-    db.refresh(customer)
-    return customer
+    return CustomerService.create_customer(db, request)
 
 @router.put("/{customer_id}", response_model=CustomerResponse)
 def update_customer(
@@ -66,17 +48,7 @@ def update_customer(
     current_user: Staff = Depends(get_current_user)
 ):
     """Cập nhật customer"""
-    customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
-    if not customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    
-    update_data = request.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(customer, key, value)
-    
-    db.commit()
-    db.refresh(customer)
-    return customer
+    return CustomerService.update_customer(db, customer_id, request)
 
 @router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_customer(
@@ -85,10 +57,5 @@ def delete_customer(
     current_user: Staff = Depends(require_admin)
 ):
     """Xóa customer (Admin only)"""
-    customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
-    if not customer:
-        raise HTTPException(status_code=404, detail="Customer not found")
-    
-    db.delete(customer)
-    db.commit()
+    CustomerService.delete_customer(db, customer_id)
     return None

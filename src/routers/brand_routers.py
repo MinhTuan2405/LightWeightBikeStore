@@ -6,6 +6,7 @@ from models.brand import Brand
 from schemas.brand import BrandCreate, BrandUpdate, BrandResponse
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
+from services.brand_service import BrandService
 
 router = APIRouter(prefix="/api/brands", tags=["Brands"])
 
@@ -16,15 +17,12 @@ def get_brands(
     db: Session = Depends(get_db)
 ):
     """Lấy danh sách brands"""
-    return db.query(Brand).offset(skip).limit(limit).all()
+    return BrandService.get_brands(db, skip, limit)
 
 @router.get("/{brand_id}", response_model=BrandResponse)
 def get_brand(brand_id: int, db: Session = Depends(get_db)):
     """Lấy chi tiết brand theo ID"""
-    brand = db.query(Brand).filter(Brand.brand_id == brand_id).first()
-    if not brand:
-        raise HTTPException(status_code=404, detail="Brand not found")
-    return brand
+    return BrandService.get_brand_by_id(db, brand_id)
 
 @router.post("", response_model=BrandResponse, status_code=status.HTTP_201_CREATED)
 def create_brand(
@@ -33,11 +31,7 @@ def create_brand(
     current_user: Staff = Depends(require_admin)
 ):
     """Tạo brand mới (Admin only)"""
-    brand = Brand(**request.model_dump())
-    db.add(brand)
-    db.commit()
-    db.refresh(brand)
-    return brand
+    return BrandService.create_brand(db, request)
 
 @router.put("/{brand_id}", response_model=BrandResponse)
 def update_brand(
@@ -47,17 +41,7 @@ def update_brand(
     current_user: Staff = Depends(require_admin)
 ):
     """Cập nhật brand (Admin only)"""
-    brand = db.query(Brand).filter(Brand.brand_id == brand_id).first()
-    if not brand:
-        raise HTTPException(status_code=404, detail="Brand not found")
-    
-    update_data = request.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(brand, key, value)
-    
-    db.commit()
-    db.refresh(brand)
-    return brand
+    return BrandService.update_brand(db, brand_id, request)
 
 @router.delete("/{brand_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_brand(
@@ -66,10 +50,5 @@ def delete_brand(
     current_user: Staff = Depends(require_admin)
 ):
     """Xóa brand (Admin only)"""
-    brand = db.query(Brand).filter(Brand.brand_id == brand_id).first()
-    if not brand:
-        raise HTTPException(status_code=404, detail="Brand not found")
-    
-    db.delete(brand)
-    db.commit()
+    BrandService.delete_brand(db, brand_id)
     return None
