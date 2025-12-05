@@ -7,26 +7,24 @@ from services.auth_service import AuthService
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
 
+# Nhóm các endpoint liên quan đến xác thực dưới prefix /api/auth
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=StaffResponse, status_code=status.HTTP_201_CREATED)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """
-    DANG KY TAI KHOAN MOI
-    
-    - **username**: Ten dang nhap (unique)
-    - **email**: Email (unique)
-    - **password**: Mat khau (>= 8 ky tu)
-    - **role**: ADMIN hoac STAFF
+    ĐĂNG KÝ TÀI KHOẢN MỚI
+    - username: Tên đăng nhập (duy nhất)
+    - email: Email (duy nhất)
+    - password: Mật khẩu (>= 8 ký tự)
+    - role: ADMIN hoặc STAFF
     """
     return AuthService.register_staff(db, request)
 
 @router.post("/login", response_model=TokenResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     """
-    DANG NHAP
-    
-    Tra ve JWT access token
+    ĐĂNG NHẬP: Trả về JWT access token
     """
     return AuthService.login(db, request)
 
@@ -36,9 +34,7 @@ def login_for_access_token(
     db: Session = Depends(get_db)
 ):
     """
-    OAUTH2 TOKEN
-    
-    Dung cho Swagger UI Authorize button
+    Lấy token theo chuẩn OAuth2 (dùng cho Swagger UI Authorize)
     """
     request = LoginRequest(username=form_data.username, password=form_data.password)
     return AuthService.login(db, request)
@@ -46,18 +42,14 @@ def login_for_access_token(
 @router.get("/me", response_model=StaffResponse)
 def get_current_user_info(current_user: Staff = Depends(get_current_user)):
     """
-    THONG TIN USER HIEN TAI
-    
-    Yeu cau JWT token trong header
+    Lấy thông tin user hiện tại (cần JWT Bearer token)
     """
     return current_user
 
 @router.get("/admin-only")
 def admin_only_route(current_user: Staff = Depends(require_admin)):
     """
-    ENDPOINT CHI ADMIN
-    
-    Vi du ve phan quyen
+    Endpoint ví dụ chỉ cho ADMIN (minh họa phân quyền)
     """
     return {
         "message": f"Hello Admin {current_user.username}!",

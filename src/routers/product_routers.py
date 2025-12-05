@@ -10,6 +10,7 @@ from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
 from services.product_service import ProductService
 
+# Nhóm endpoint quản lý Sản phẩm
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
 @router.get("", response_model=List[ProductResponse])
@@ -20,12 +21,12 @@ def get_products(
     category_id: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
-    """Lấy danh sách sản phẩm (có filter và pagination)"""
+    """Lấy danh sách sản phẩm (có lọc theo brand/category và phân trang)"""
     return ProductService.get_products(db, skip, limit, brand_id, category_id)
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_product(product_id: int, db: Session = Depends(get_db)):
-    """Lấy chi tiết sản phẩm theo ID"""
+    """Lấy chi tiết 1 sản phẩm theo ID"""
     return ProductService.get_product_by_id(db, product_id)
 
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
@@ -34,7 +35,7 @@ def create_product(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Tạo sản phẩm mới (Admin only)"""
+    """Tạo sản phẩm mới (chỉ ADMIN)"""
     return ProductService.create_product(db, request)
 
 @router.put("/{product_id}", response_model=ProductResponse)
@@ -44,7 +45,7 @@ def update_product(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Cập nhật sản phẩm (Admin only)"""
+    """Cập nhật sản phẩm (chỉ ADMIN)"""
     return ProductService.update_product(db, product_id, request)
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -53,6 +54,6 @@ def delete_product(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Xóa sản phẩm (Admin only)"""
+    """Xóa sản phẩm (chỉ ADMIN)"""
     ProductService.delete_product(db, product_id)
     return None

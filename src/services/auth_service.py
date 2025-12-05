@@ -9,7 +9,7 @@ from datetime import timedelta
 class AuthService:
     @staticmethod
     def register_staff(db: Session, request: RegisterRequest) -> Staff:
-        """Đăng ký tài khoản staff mới"""
+        """Đăng ký tài khoản staff mới (hash mật khẩu, kiểm tra trùng lặp)"""
         # Kiểm tra username hoặc email đã tồn tại
         existing_user = db.query(Staff).filter(
             (Staff.username == request.username) | (Staff.email == request.email)
@@ -21,7 +21,7 @@ class AuthService:
                 detail="Username or email already registered"
             )
         
-        # Hash password
+        # Hash password (không lưu plain-text)
         hashed_pwd = hash_password(request.password)
         
         # Tạo staff mới
@@ -42,7 +42,7 @@ class AuthService:
             return new_staff
         except IntegrityError as e:
             db.rollback()
-            print(f"IntegrityError: {e}")  # Log để debug
+            print(f"IntegrityError: {e}")  # Log để debug (ví dụ: vi phạm unique)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Database integrity error: {str(e.orig)}"
@@ -50,7 +50,7 @@ class AuthService:
     
     @staticmethod
     def login(db: Session, request: LoginRequest) -> dict:
-        """Đăng nhập và trả về JWT token"""
+        """Đăng nhập: xác thực mật khẩu, kiểm tra active, trả JWT"""
         # Tìm user theo username
         user = db.query(Staff).filter(Staff.username == request.username).first()
         

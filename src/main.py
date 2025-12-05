@@ -1,6 +1,8 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import os
+# Import các nhóm router chức năng của API
 from routers import (
     auth_routers,
     product_routers,
@@ -12,24 +14,28 @@ from routers import (
     statistics_routers
 )
 
+# Khởi tạo ứng dụng FastAPI với mô tả rõ ràng
 app = FastAPI(
     title="LightWeight Bike Store API",
     description="Backend API with JWT Authentication & Authorization",
     version="2.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    docs_url="/docs",   # Trang Swagger UI
+    redoc_url="/redoc"  # Trang ReDoc
 )
 
-# CORS
+# CORS: Cho phép frontend từ domain khác gọi API
+# Lấy danh sách origins từ biến môi trường hoặc cho phép tất cả
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins if allowed_origins != ["*"] else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Default router
+# Default router: các endpoint cơ bản (root, health)
 default_route = APIRouter(tags=['DEFAULT'])
 
 @default_route.get("/", response_class=JSONResponse)
@@ -53,7 +59,7 @@ def read_root():
 def health_check():
     return {"status": "healthy", "version": "2.0.0"}
 
-# Include routers
+# Include routers: đăng ký các nhóm endpoint vào app
 app.include_router(default_route)
 app.include_router(auth_routers.router)
 app.include_router(product_routers.router)
@@ -65,5 +71,6 @@ app.include_router(staff_routers.router)
 app.include_router(statistics_routers.router)
 
 if __name__ == "__main__":
+    # Chạy server phát triển: http://localhost:8000
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
