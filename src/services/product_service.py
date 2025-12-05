@@ -15,6 +15,7 @@ class ProductService:
         brand_id: Optional[int] = None, 
         category_id: Optional[int] = None
     ) -> List[Product]:
+        """Danh sách sản phẩm với filter brand/category và phân trang"""
         query = db.query(Product)
         
         if brand_id:
@@ -33,6 +34,7 @@ class ProductService:
 
     @staticmethod
     def create_product(db: Session, request: ProductCreate) -> Product:
+        """Tạo sản phẩm: kiểm tra brand/category, rồi lưu"""
         # Kiểm tra brand tồn tại
         brand = db.query(Brand).filter(Brand.brand_id == request.brand_id).first()
         if not brand:
@@ -43,7 +45,7 @@ class ProductService:
         if not category:
             raise HTTPException(status_code=400, detail="Category not found")
         
-        product = Product(**request.model_dump())
+        product = Product(**request.model_dump())  # Tạo object Product từ schema
         db.add(product)
         db.commit()
         db.refresh(product)
@@ -55,7 +57,7 @@ class ProductService:
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
         
-        update_data = request.model_dump(exclude_unset=True)
+        update_data = request.model_dump(exclude_unset=True)  # Chỉ cập nhật trường được gửi
         for key, value in update_data.items():
             setattr(product, key, value)
         
