@@ -1,0 +1,1153 @@
+{
+  "info": {
+    "name": "BikeStore Shop API",
+    "description": "Complete API collection for BikeStore Shop - Version 2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "bikestore-api-collection",
+    "version": "2.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "1.1. Register Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    console.log('Admin registered successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"email\": \"admin@bikestore.com\",\n  \"password\": \"Admin@123456\",\n  \"first_name\": \"Super\",\n  \"last_name\": \"Admin\",\n  \"phone\": \"0987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Create new ADMIN account (Public - no authentication required)"
+          },
+          "response": []
+        },
+        {
+          "name": "1.2. Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.access_token);",
+                  "    console.log('Token saved: ' + jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login and get JWT token (automatically saves to collection variable)"
+          },
+          "response": []
+        },
+        {
+          "name": "1.3. Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get current user information (requires authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "1.4. Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Updated\",\n  \"last_name\": \"Name\",\n  \"phone\": \"0912345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Update own profile (cannot change email)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Staff Management",
+      "item": [
+        {
+          "name": "2.1. Create Staff",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"staff001\",\n  \"email\": \"staff001@bikestore.com\",\n  \"password\": \"StaffPass123\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"phone\": \"0987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/staffs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staffs"]
+            },
+            "description": "Admin creates new STAFF account (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.2. Get All Staffs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staffs"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Get list of staffs managed by current admin (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.3. Get Staff by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staffs", "2"]
+            },
+            "description": "Get staff details (ADMIN only, must be managed by this admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.4. Update Staff",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newemail@bikestore.com\",\n  \"first_name\": \"John Updated\",\n  \"phone\": \"0999999999\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/staffs/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staffs", "2"]
+            },
+            "description": "Update staff info including email (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.5. Delete Staff",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/staffs/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staffs", "2"]
+            },
+            "description": "Delete staff account (ADMIN only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Products",
+      "item": [
+        {
+          "name": "3.1. Get All Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "brand_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get products list with pagination and filters (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "3.2. Get Product by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1"]
+            },
+            "description": "Get product details (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "3.3. Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_name\": \"Giant Talon 3 - Mountain Bike\",\n  \"brand_id\": 2,\n  \"category_id\": 1,\n  \"model_year\": 2024,\n  \"list_price\": 750.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Create new product (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "3.4. Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_name\": \"Giant Talon 3 - Updated\",\n  \"list_price\": 799.99\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1"]
+            },
+            "description": "Update product (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "3.5. Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "1"]
+            },
+            "description": "Delete product (ADMIN only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Brands",
+      "item": [
+        {
+          "name": "4.1. Get All Brands",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/brands?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Get all brands (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "4.2. Get Brand by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/brands/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands", "1"]
+            },
+            "description": "Get brand details (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "4.3. Create Brand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_name\": \"Cannondale\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/brands",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands"]
+            },
+            "description": "Create new brand (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "4.4. Update Brand",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_name\": \"Cannondale Updated\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/brands/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands", "1"]
+            },
+            "description": "Update brand (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "4.5. Delete Brand",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/brands/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "brands", "1"]
+            },
+            "description": "Delete brand (ADMIN only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Categories",
+      "item": [
+        {
+          "name": "5.1. Get All Categories",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Get all categories (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "5.2. Get Category by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "1"]
+            },
+            "description": "Get category details (Public)"
+          },
+          "response": []
+        },
+        {
+          "name": "5.3. Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_name\": \"Electric Bikes\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories"]
+            },
+            "description": "Create new category (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "5.4. Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_name\": \"E-Bikes\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "1"]
+            },
+            "description": "Update category (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "5.5. Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "1"]
+            },
+            "description": "Delete category (ADMIN only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Customers",
+      "item": [
+        {
+          "name": "6.1. Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/customers?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "customers"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "city",
+                  "value": "Ho Chi Minh",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get customers list (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "6.2. Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/customers/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Get customer details (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "6.3. Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Alice\",\n  \"last_name\": \"Johnson\",\n  \"email\": \"alice@example.com\",\n  \"phone\": \"0912345678\",\n  \"street\": \"456 Oak Ave\",\n  \"city\": \"Ha Noi\",\n  \"state\": \"HN\",\n  \"zip_code\": \"10000\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/customers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "customers"]
+            },
+            "description": "Create new customer (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "6.4. Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"0999999999\",\n  \"city\": \"Da Nang\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/customers/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Update customer (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "6.5. Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/customers/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "customers", "1"]
+            },
+            "description": "Delete customer (ADMIN only)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Orders",
+      "item": [
+        {
+          "name": "7.1. Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "customer_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "staff_id",
+                  "value": "2",
+                  "disabled": true
+                },
+                {
+                  "key": "order_status",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get orders list (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.2. Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Get order details with items (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.3. Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 1,\n  \"order_status\": 1,\n  \"order_date\": \"2025-12-22\",\n  \"required_date\": \"2025-12-25\",\n  \"store_id\": 1,\n  \"staff_id\": 2,\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2,\n      \"list_price\": 1899.99,\n      \"discount\": 0.05\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 1,\n      \"list_price\": 750.00,\n      \"discount\": 0\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Create new order with items (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.4. Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_status\": 3,\n  \"shipped_date\": \"2025-12-23\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Update order status (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.5. Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1"]
+            },
+            "description": "Delete order (ADMIN only)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.6. Get Order Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/1/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1", "items"]
+            },
+            "description": "Get order items (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.7. Add Order Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 3,\n  \"quantity\": 1,\n  \"list_price\": 999.99,\n  \"discount\": 0.1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/1/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1", "items"]
+            },
+            "description": "Add item to order (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.8. Update Order Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3,\n  \"discount\": 0.15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/1/items/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1", "items", "1"]
+            },
+            "description": "Update order item (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "7.9. Delete Order Item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/1/items/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1", "items", "1"]
+            },
+            "description": "Delete order item (Authenticated)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Statistics",
+      "item": [
+        {
+          "name": "8.1. Store Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/store/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "store", "overview"]
+            },
+            "description": "Get store overview statistics (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.2. Store Sales by Day",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/store/sales/by-day?start_date=2025-12-01&end_date=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "store", "sales", "by-day"],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2025-12-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-12-31"
+                }
+              ]
+            },
+            "description": "Get sales by day (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.3. Store Sales by Month",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/store/sales/by-month?year=2025",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "store", "sales", "by-month"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2025"
+                }
+              ]
+            },
+            "description": "Get sales by month (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.4. Store Sales by Quarter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/store/sales/by-quarter?year=2025",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "store", "sales", "by-quarter"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2025"
+                }
+              ]
+            },
+            "description": "Get sales by quarter (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.5. Store Sales by Year",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/store/sales/by-year",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "store", "sales", "by-year"]
+            },
+            "description": "Get sales by year (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.6. Staff Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/staffs/count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "staffs", "count"]
+            },
+            "description": "Get staff count statistics (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.7. All Staff Sales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/staffs/sales",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "staffs", "sales"]
+            },
+            "description": "Get sales for all staff (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.8. Staff Sales by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/staffs/2/sales",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "staffs", "2", "sales"]
+            },
+            "description": "Get sales for specific staff (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.9. Staff Sales by Month",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/staffs/2/sales/by-month?year=2025",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "staffs", "2", "sales", "by-month"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2025"
+                }
+              ]
+            },
+            "description": "Get staff sales by month (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.10. Top Selling Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/products/top-selling?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "products", "top-selling"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get top selling products (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.11. Top Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/customers/top-buyers?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "customers", "top-buyers"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get top customers (Authenticated)"
+          },
+          "response": []
+        },
+        {
+          "name": "8.12. Highest Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/statistics/customers/highest-orders?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics", "customers", "highest-orders"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get highest value orders (Authenticated)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Check API health status"
+          },
+          "response": []
+        },
+        {
+          "name": "Root",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Get API information"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
