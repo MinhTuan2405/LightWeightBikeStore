@@ -49,21 +49,50 @@ class StaffService:
                 detail=f"Database integrity error: {str(e.orig)}"
             )
     @staticmethod
-    def get_staffs(db: Session, skip: int = 0, limit: int = 100) -> List[Staff]:
-        return db.query(Staff).offset(skip).limit(limit).all()
+    def get_staffs(db: Session, current_user: Staff, skip: int = 0, limit: int = 100) -> List[Staff]:
+        """
+        Lấy danh sách staff của admin hiện tại
+        Chỉ trả về các staff có manager_id = admin_id
+        """
+        return db.query(Staff).filter(
+            Staff.manager_id == current_user.staff_id
+        ).offset(skip).limit(limit).all()
 
     @staticmethod
-    def get_staff_by_id(db: Session, staff_id: int) -> Staff:
+    def get_staff_by_id(db: Session, staff_id: int, current_user: Staff) -> Staff:
+        """
+        Lấy thông tin staff theo ID
+        Kiểm tra staff phải do admin hiện tại quản lý
+        """
         staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
         if not staff:
             raise HTTPException(status_code=404, detail="Staff not found")
+        
+        # Kiểm tra quyền quản lý: staff phải có manager_id = admin_id
+        if staff.manager_id != current_user.staff_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only manage your own staff members"
+            )
+        
         return staff
 
     @staticmethod
-    def update_staff(db: Session, staff_id: int, request: StaffUpdate) -> Staff:
+    def update_staff(db: Session, staff_id: int, request: StaffUpdate, current_user: Staff) -> Staff:
+        """
+        Cập nhật thông tin staff
+        Chỉ admin quản lý staff đó mới có quyền sửa
+        """
         staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
         if not staff:
             raise HTTPException(status_code=404, detail="Staff not found")
+        
+        # Kiểm tra quyền quản lý
+        if staff.manager_id != current_user.staff_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only manage your own staff members"
+            )
         
         update_data = request.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -74,14 +103,25 @@ class StaffService:
         return staff
 
     @staticmethod
-    def delete_staff(db: Session, staff_id: int, current_user_id: int) -> None:
+    def delete_staff(db: Session, staff_id: int, current_user: Staff) -> None:
+        """
+        Xóa staff
+        Chỉ admin quản lý staff đó mới có quyền xóa
+        """
         staff = db.query(Staff).filter(Staff.staff_id == staff_id).first()
         if not staff:
             raise HTTPException(status_code=404, detail="Staff not found")
         
         # Không cho phép xóa chính mình
-        if staff.staff_id == current_user_id:
+        if staff.staff_id == current_user.staff_id:
             raise HTTPException(status_code=400, detail="Cannot delete yourself")
+        
+        # Kiểm tra quyền quản lý
+        if staff.manager_id != current_user.staff_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only delete your own staff members"
+            )
         
         db.delete(staff)
         db.commit()

@@ -33,8 +33,8 @@ def get_staffs(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Lấy danh sách staffs (Admin only)"""
-    return StaffService.get_staffs(db, skip, limit)
+    """Lấy danh sách staffs do admin hiện tại quản lý (Admin only)"""
+    return StaffService.get_staffs(db, current_user, skip, limit)
 
 @router.get("/{staff_id}", response_model=StaffListResponse)
 def get_staff(
@@ -42,8 +42,8 @@ def get_staff(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Lấy chi tiết staff theo ID (Admin only)"""
-    return StaffService.get_staff_by_id(db, staff_id)
+    """Lấy chi tiết staff do admin hiện tại quản lý (Admin only)"""
+    return StaffService.get_staff_by_id(db, staff_id, current_user)
 
 @router.put("/{staff_id}", response_model=StaffListResponse)
 def update_staff(
@@ -53,13 +53,15 @@ def update_staff(
     current_user: Staff = Depends(require_admin)
 ):
     """
-    Cập nhật thông tin staff (Admin only)
+    Cập nhật thông tin staff (Chỉ admin quản lý staff đó)
     Admin có quyền:
     - Cập nhật email của staff
     - Thay đổi role (ADMIN/STAFF)
-    - Cập nhật tất cả thông tin khác (first_name, last_name, phone, active, is_active, manager_id)
+    - Cập nhật tất cả thông tin khác (first_name, last_name, phone, active, is_active)
+    
+    Lưu ý: Admin chỉ có thể sửa staff mà chính họ tạo ra (manager_id = admin_id)
     """
-    return StaffService.update_staff(db, staff_id, request)
+    return StaffService.update_staff(db, staff_id, request, current_user)
 
 @router.delete("/{staff_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_staff(
@@ -68,8 +70,9 @@ def delete_staff(
     current_user: Staff = Depends(require_admin)
 ):
     """
-    Xóa tài khoản staff (Admin only)
-    Admin có thể xóa bất kỳ staff nào (trừ chính mình)
+    Xóa tài khoản staff (Chỉ admin quản lý staff đó)
+    Admin có thể xóa staff mà chính họ tạo ra (manager_id = admin_id)
+    Không thể xóa chính mình
     """
-    StaffService.delete_staff(db, staff_id, current_user.staff_id)
+    StaffService.delete_staff(db, staff_id, current_user)
     return None

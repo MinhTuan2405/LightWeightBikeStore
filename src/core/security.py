@@ -5,15 +5,12 @@ import bcrypt                             # bcrypt: Mã hóa mật khẩu an to�
 from dotenv import load_dotenv
 import os
 
-# Bảo mật: Đọc cấu hình từ file .env (tránh hard-code khóa bí mật trong code)
 load_dotenv()
 
-# SECRET_KEY: "Chìa khóa vàng" để ký Token. TUYỆT ĐỐI không lộ.
-# ALGORITHM: Thuật toán ký JWT (mặc định HS256)
-# ACCESS_TOKEN_EXPIRE_MINUTES: Thời gian sống của Token (mặc định 30 phút)
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-minimum-32-characters-long-please-change-this")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+
 
 # Hàm 1: Mã hóa mật khẩu khi đăng ký
 def hash_password(password: str) -> str:

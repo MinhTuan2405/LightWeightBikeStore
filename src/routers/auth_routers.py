@@ -16,14 +16,7 @@ def register(
     db: Session = Depends(get_db)
 ):
     """
-    ĐĂNG KÝ TÀI KHOẢN ADMIN MỚI (PUBLIC - Không cần đăng nhập)
-    
-    Endpoint này dùng để:
-    - Tạo admin đầu tiên cho hệ thống
-    - Admin khác tự đăng ký (nếu cần mở rộng)
-    
-    Lưu ý: CHỈ tạo được ADMIN, không thể tạo STAFF qua endpoint này
-    Để tạo STAFF, admin phải dùng: POST /api/staffs
+    ĐĂNG KÝ TÀI KHOẢN ADMIN MỚI
     """
     return AuthService.register_admin(db, request)
 
