@@ -35,7 +35,13 @@ def update_staff(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Cập nhật staff (Admin only)"""
+    """
+    Cập nhật thông tin staff (Admin only)
+    Admin có quyền:
+    - Cập nhật email của staff
+    - Thay đổi role (ADMIN/STAFF)
+    - Cập nhật tất cả thông tin khác (first_name, last_name, phone, active, is_active, manager_id)
+    """
     return StaffService.update_staff(db, staff_id, request)
 
 @router.delete("/{staff_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -44,6 +50,9 @@ def delete_staff(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(require_admin)
 ):
-    """Xóa staff (Admin only)"""
+    """
+    Xóa tài khoản staff (Admin only)
+    Admin có thể xóa bất kỳ staff nào (trừ chính mình)
+    """
     StaffService.delete_staff(db, staff_id, current_user.staff_id)
     return None

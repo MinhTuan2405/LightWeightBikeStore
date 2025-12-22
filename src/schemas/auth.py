@@ -10,7 +10,7 @@ class RegisterRequest(BaseModel):
     first_name: str
     last_name: str
     phone: Optional[str] = None
-    role: Optional[str] = "STAFF"
+    role: Optional[str] = "ADMIN"
     
     @field_validator('password')
     @classmethod
@@ -24,6 +24,20 @@ class RegisterRequest(BaseModel):
     def validate_role(cls, v):
         if v not in ['ADMIN', 'STAFF']:
             raise ValueError('Role must be ADMIN or STAFF')
+        return v
+
+class StaffProfileUpdate(BaseModel):
+    """Schema cập nhật profile của staff (KHÔNG có email)"""
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None
+    password: Optional[str] = None  # Nếu muốn đổi password
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if v is not None and len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
         return v
 
 class LoginRequest(BaseModel):
