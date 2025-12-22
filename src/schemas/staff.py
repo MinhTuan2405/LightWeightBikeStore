@@ -1,8 +1,24 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import datetime
 
 # ========== REQUEST SCHEMAS ==========
+
+class StaffCreate(BaseModel):
+    """Schema tạo staff mới (chỉ admin)"""
+    username: str
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        return v
 
 class StaffUpdate(BaseModel):
     first_name: Optional[str] = None

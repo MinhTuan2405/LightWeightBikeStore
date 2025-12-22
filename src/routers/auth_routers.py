@@ -13,19 +13,19 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 @router.post("/register", response_model=StaffResponse, status_code=status.HTTP_201_CREATED)
 def register(
     request: RegisterRequest, 
-    db: Session = Depends(get_db),
-    current_user: Staff = Depends(require_admin)
+    db: Session = Depends(get_db)
 ):
     """
-    ĐĂNG KÝ TÀI KHOẢN MỚI (CHỈ ADMIN)
-    - Mặc định tạo ADMIN (role không quản lý ai)
-    - Nếu tạo STAFF: Staff đó sẽ được quản lý bởi admin tạo ra họ
-    - username: Tên đăng nhập (duy nhất)
-    - email: Email (duy nhất, bắt buộc)
-    - password: Mật khẩu (>= 8 ký tự)
-    - role: ADMIN hoặc STAFF (mặc định ADMIN)
+    ĐĂNG KÝ TÀI KHOẢN ADMIN MỚI (PUBLIC - Không cần đăng nhập)
+    
+    Endpoint này dùng để:
+    - Tạo admin đầu tiên cho hệ thống
+    - Admin khác tự đăng ký (nếu cần mở rộng)
+    
+    Lưu ý: CHỈ tạo được ADMIN, không thể tạo STAFF qua endpoint này
+    Để tạo STAFF, admin phải dùng: POST /api/staffs
     """
-    return AuthService.register_staff(db, request, current_user)
+    return AuthService.register_admin(db, request)
 
 @router.post("/login", response_model=TokenResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):

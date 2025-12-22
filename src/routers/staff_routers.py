@@ -3,11 +3,28 @@ from sqlalchemy.orm import Session
 from typing import List
 from core.database import get_db
 from models.staff import Staff
-from schemas.staff import StaffUpdate, StaffListResponse
+from schemas.staff import StaffUpdate, StaffListResponse, StaffCreate
 from middleware.auth import get_current_user, require_admin
 from services.staff_service import StaffService
 
 router = APIRouter(prefix="/api/staffs", tags=["Staffs"])
+
+@router.post("", response_model=StaffListResponse, status_code=status.HTTP_201_CREATED)
+def create_staff(
+    request: StaffCreate,
+    db: Session = Depends(get_db),
+    current_user: Staff = Depends(require_admin)
+):
+    """
+    TẠO TÀI KHOẢN STAFF MỚI (CHỈ ADMIN)
+    
+    Admin tạo staff mới, staff đó sẽ được quản lý bởi admin tạo ra họ.
+    - username: Tên đăng nhập (duy nhất)
+    - email: Email (duy nhất, bắt buộc)
+    - password: Mật khẩu (>= 8 ký tự)
+    - Staff được tạo sẽ có manager_id = admin_id
+    """
+    return StaffService.create_staff(db, request, current_user)
 
 @router.get("", response_model=List[StaffListResponse])
 def get_staffs(

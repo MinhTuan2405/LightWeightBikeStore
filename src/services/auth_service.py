@@ -8,8 +8,8 @@ from datetime import timedelta
 
 class AuthService:
     @staticmethod
-    def register_staff(db: Session, request: RegisterRequest, current_user: Staff) -> Staff:
-        """Đăng ký tài khoản staff mới (hash mật khẩu, kiểm tra trùng lặp)"""
+    def register_admin(db: Session, request: RegisterRequest) -> Staff:
+        """Đăng ký tài khoản ADMIN (PUBLIC, không cần auth)"""
         # Kiểm tra username hoặc email đã tồn tại
         existing_user = db.query(Staff).filter(
             (Staff.username == request.username) | (Staff.email == request.email)
@@ -21,15 +21,10 @@ class AuthService:
                 detail="Username or email already registered"
             )
         
-        # Hash password (không lưu plain-text)
+        # Hash password
         hashed_pwd = hash_password(request.password)
         
-        # Xác định manager_id: nếu tạo STAFF thì manager là admin hiện tại
-        manager_id = None
-        if request.role == "STAFF":
-            manager_id = current_user.staff_id
-        
-        # Tạo staff mới
+        # Tạo admin mới (luôn là ADMIN, manager_id = NULL)
         new_staff = Staff(
             username=request.username,
             email=request.email,
@@ -37,8 +32,8 @@ class AuthService:
             first_name=request.first_name,
             last_name=request.last_name,
             phone=request.phone,
-            role=request.role,
-            manager_id=manager_id
+            role="ADMIN",
+            manager_id=None
         )
         
         try:

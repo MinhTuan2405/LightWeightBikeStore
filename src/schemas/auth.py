@@ -3,27 +3,19 @@ from typing import Optional
 from datetime import datetime
 
 class RegisterRequest(BaseModel):
-    """Schema đăng ký tài khoản"""
+    """Schema đăng ký tài khoản ADMIN (không có field role)"""
     username: str
     email: EmailStr
     password: str
     first_name: str
     last_name: str
     phone: Optional[str] = None
-    role: Optional[str] = "ADMIN"
     
     @field_validator('password')
     @classmethod
     def validate_password(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters')
-        return v
-    
-    @field_validator('role')
-    @classmethod
-    def validate_role(cls, v):
-        if v not in ['ADMIN', 'STAFF']:
-            raise ValueError('Role must be ADMIN or STAFF')
         return v
 
 class StaffProfileUpdate(BaseModel):
