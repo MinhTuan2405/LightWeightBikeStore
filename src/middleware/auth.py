@@ -20,22 +20,22 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    # 1) Giải mã token
+    # Giải mã token
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception  # Token hỏng/hết hạn
 
-    # 2) Lấy username từ payload (trường 'sub')
+    # Lấy username từ payload 
     username: str = payload.get("sub")
     if username is None:
         raise credentials_exception
 
-    # 3) Truy vấn DB để lấy user tương ứng
+    # Truy vấn DB để lấy user tương ứng
     user = db.query(Staff).filter(Staff.username == username).first()
     if user is None:
         raise credentials_exception
 
-    # 4) Kiểm tra trạng thái hoạt động
+    # Kiểm tra trạng thái hoạt động
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
 

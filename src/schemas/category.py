@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# ========== REQUEST SCHEMAS ==========
+#    REQUEST SCHEMAS   
 
 class CategoryCreate(BaseModel):
     category_name: str
@@ -9,7 +9,7 @@ class CategoryCreate(BaseModel):
 class CategoryUpdate(BaseModel):
     category_name: Optional[str] = None
 
-# ========== RESPONSE SCHEMAS ==========
+#    RESPONSE SCHEMAS   
 
 class CategoryResponse(BaseModel):
     category_id: int

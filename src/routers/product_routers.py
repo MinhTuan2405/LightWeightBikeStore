@@ -10,7 +10,6 @@ from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
 from services.product_service import ProductService
 
-# Nhóm endpoint quản lý Sản phẩm
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
 @router.get("", response_model=List[ProductResponse])
@@ -21,7 +20,7 @@ def get_products(
     category_id: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
-    """Lấy danh sách sản phẩm (có lọc theo brand/category và phân trang)"""
+    """Lấy danh sách sản phẩm"""
     return ProductService.get_products(db, skip, limit, brand_id, category_id)
 
 @router.get("/{product_id}", response_model=ProductResponse)

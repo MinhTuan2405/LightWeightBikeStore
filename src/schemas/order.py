@@ -3,7 +3,7 @@ from typing import Optional, List
 from datetime import date
 from decimal import Decimal
 
-# ========== REQUEST SCHEMAS ==========
+#    REQUEST SCHEMAS   
 
 class OrderItemCreate(BaseModel):
     product_id: int
@@ -34,7 +34,7 @@ class OrderItemUpdate(BaseModel):
     list_price: Optional[Decimal] = None
     discount: Optional[Decimal] = None
 
-# ========== RESPONSE SCHEMAS ==========
+#    RESPONSE SCHEMAS   
 
 class OrderItemResponse(BaseModel):
     order_id: int

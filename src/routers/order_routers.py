@@ -16,7 +16,6 @@ from services.order_service import OrderService
 
 router = APIRouter(prefix="/api/orders", tags=["Orders"])
 
-# ==================== ORDERS ====================
 
 @router.get("", response_model=List[OrderResponse])
 def get_orders(
@@ -37,7 +36,7 @@ def get_order(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(get_current_user)
 ):
-    """Lấy chi tiết order theo ID (kèm items)"""
+    """Lấy chi tiết order theo ID"""
     return OrderService.get_order_by_id(db, order_id)
 
 @router.post("", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
@@ -69,7 +68,6 @@ def delete_order(
     OrderService.delete_order(db, order_id)
     return None
 
-# ==================== ORDER ITEMS ====================
 
 @router.get("/{order_id}/items", response_model=List[OrderItemResponse])
 def get_order_items(

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# ========== REQUEST SCHEMAS ==========
+#    REQUEST SCHEMAS   
 
 class CustomerCreate(BaseModel):
     first_name: str
@@ -23,7 +23,7 @@ class CustomerUpdate(BaseModel):
     state: Optional[str] = None
     zip_code: Optional[str] = None
 
-# ========== RESPONSE SCHEMAS ==========
+#    RESPONSE SCHEMAS   
 
 class CustomerResponse(BaseModel):
     customer_id: int

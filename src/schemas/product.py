@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from decimal import Decimal
 
-# REQUEST SCHEMAS: Dữ liệu client gửi lên khi tạo/cập nhật sản phẩm
+# REQUEST SCHEMAS
 class ProductCreate(BaseModel):
     product_name: str
     brand_id: int
@@ -20,7 +20,7 @@ class ProductUpdate(BaseModel):
     list_price: Optional[Decimal] = None
     stock: Optional[int] = None
 
-# RESPONSE SCHEMAS: Dữ liệu trả về cho client
+# RESPONSE SCHEMAS
 class ProductResponse(BaseModel):
     product_id: int
     product_name: str
@@ -31,4 +31,4 @@ class ProductResponse(BaseModel):
     stock: Optional[int] = 0
 
     class Config:
-        from_attributes = True  # Cho phép tạo từ ORM model (SQLAlchemy)
+        from_attributes = True  

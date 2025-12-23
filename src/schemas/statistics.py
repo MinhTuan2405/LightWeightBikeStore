@@ -3,7 +3,7 @@ from typing import Optional, List
 from decimal import Decimal
 from datetime import date
 
-# ========== STAFF STATISTICS ==========
+#    STAFF STATISTICS   
 
 class StaffSalesStats(BaseModel):
     """Thống kê doanh số của nhân viên"""
@@ -31,7 +31,7 @@ class StaffCountResponse(BaseModel):
     active_staffs: int
     inactive_staffs: int
 
-# ========== STORE STATISTICS ==========
+#    STORE STATISTICS   
 
 class StoreSalesByPeriod(BaseModel):
     """Doanh số cửa hàng theo kỳ"""
@@ -51,7 +51,7 @@ class StoreOverview(BaseModel):
     total_products: int
     avg_order_value: Decimal
 
-# ========== PRODUCT STATISTICS ==========
+#    PRODUCT STATISTICS   
 
 class TopSellingProduct(BaseModel):
     """Sản phẩm bán chạy"""
@@ -65,7 +65,7 @@ class TopSellingProduct(BaseModel):
     class Config:
         from_attributes = True
 
-# ========== CUSTOMER STATISTICS ==========
+#    CUSTOMER STATISTICS   
 
 class TopCustomer(BaseModel):
     """Khách hàng mua nhiều"""
@@ -90,7 +90,7 @@ class CustomerHighestOrder(BaseModel):
     order_value: Decimal
     items_count: int
 
-# ========== RESPONSE WRAPPERS ==========
+#    RESPONSE WRAPPERS   
 
 class TopProductsResponse(BaseModel):
     """Response danh sách sản phẩm bán chạy"""

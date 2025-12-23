@@ -12,41 +12,37 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 
-# Hàm 1: Mã hóa mật khẩu khi đăng ký
 def hash_password(password: str) -> str:
-    """Mã hóa password bằng bcrypt (thêm muối tự động)"""
+    """Mã hóa password bằng bcrypt """
     password_bytes = password.encode('utf-8')       # Chuyển chuỗi sang bytes
-    salt = bcrypt.gensalt()                         # Tạo muối ngẫu nhiên
-    hashed = bcrypt.hashpw(password_bytes, salt)    # Băm mật khẩu với muối
-    return hashed.decode('utf-8')                   # Trả về chuỗi hashed
+    salt = bcrypt.gensalt()                        
+    hashed = bcrypt.hashpw(password_bytes, salt)   
+    return hashed.decode('utf-8')                   
 
-# Hàm 2: Kiểm tra mật khẩu khi đăng nhập
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """So sánh password gốc với password đã hash (an toàn)"""
     password_bytes = plain_password.encode('utf-8')
     hashed_bytes = hashed_password.encode('utf-8')
-    return bcrypt.checkpw(password_bytes, hashed_bytes)  # bcrypt tự xử lý so khớp
+    return bcrypt.checkpw(password_bytes, hashed_bytes)  
 
-# Hàm 3: Tạo thẻ ra vào (JWT Access Token)
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Tạo JWT access token từ dữ liệu (ví dụ: username, role)"""
-    to_encode = data.copy()  # Dữ liệu đưa vào token
+    to_encode = data.copy()  
 
     # Tính thời gian hết hạn cho token
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    to_encode.update({"exp": expire})               # Thêm thời hạn vào payload
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)  # Ký token bằng SECRET_KEY
+    to_encode.update({"exp": expire})             
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)  
     return encoded_jwt
 
-# Hàm 4: Giải mã và kiểm tra token
 def decode_access_token(token: str) -> Optional[dict]:
     """Giải mã JWT token để lấy payload; trả None nếu hết hạn/không hợp lệ"""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # Xác thực chữ ký + hạn dùng
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  
         return payload
     except JWTError:
-        return None  # Token giả hoặc đã hết hạn
+        return None  

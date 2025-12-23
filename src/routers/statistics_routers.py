@@ -31,7 +31,7 @@ from services.statistics_service import StatisticsService
 
 router = APIRouter(prefix="/api/statistics", tags=["Statistics"])
 
-# ==================== STAFF STATISTICS ====================
+#  STAFF STATISTICS  
 
 @router.get("/staffs/count", response_model=StaffCountResponse)
 def get_staff_count(
@@ -93,7 +93,7 @@ def get_staff_sales_by_day(
     """
     return StatisticsService.get_staff_sales_by_day(db, staff_id, start_date, end_date)
 
-# ==================== STORE STATISTICS ====================
+#   STORE STATISTICS  
 
 @router.get("/store/overview", response_model=StoreOverview)
 def get_store_overview(
@@ -151,7 +151,7 @@ def get_store_sales_by_year(
     """
     return StatisticsService.get_store_sales_by_year(db)
 
-# ==================== PRODUCT STATISTICS ====================
+#   PRODUCT STATISTICS  
 
 @router.get("/products/top-selling", response_model=TopProductsResponse)
 def get_top_selling_products(
@@ -166,7 +166,7 @@ def get_top_selling_products(
     """
     return StatisticsService.get_top_selling_products(db, limit)
 
-# ==================== CUSTOMER STATISTICS ====================
+#   CUSTOMER STATISTICS  
 
 @router.get("/customers/top-buyers", response_model=TopCustomersResponse)
 def get_top_customers(

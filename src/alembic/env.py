@@ -8,13 +8,11 @@ from alembic import context
 import sys
 import os
 
-# Thêm đường dẫn src vào Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from dotenv import load_dotenv
 load_dotenv()
 
-# Import Base và tất cả models
 from core.database import Base
 from models.staff import Staff
 from models.customer import Customer

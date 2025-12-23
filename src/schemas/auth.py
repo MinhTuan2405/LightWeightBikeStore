@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 class RegisterRequest(BaseModel):
-    """Schema đăng ký tài khoản ADMIN (không có field role)"""
+    """Schema đăng ký tài khoản ADMIN"""
     username: str
     email: EmailStr
     password: str
@@ -19,11 +19,11 @@ class RegisterRequest(BaseModel):
         return v
 
 class StaffProfileUpdate(BaseModel):
-    """Schema cập nhật profile của staff (KHÔNG có email)"""
+    """Schema cập nhật profile của staff"""
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone: Optional[str] = None
-    password: Optional[str] = None  # Nếu muốn đổi password
+    password: Optional[str] = None  
     
     @field_validator('password')
     @classmethod
@@ -43,7 +43,7 @@ class TokenResponse(BaseModel):
     token_type: str
 
 class StaffResponse(BaseModel):
-    """Schema thông tin staff (không có password)"""
+    """Schema thông tin staff"""
     staff_id: int
     username: str
     email: str

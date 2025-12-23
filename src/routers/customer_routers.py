@@ -19,7 +19,7 @@ def get_customers(
     db: Session = Depends(get_db),
     current_user: Staff = Depends(get_current_user)
 ):
-    """Lấy danh sách customers (Yêu cầu đăng nhập)"""
+    """Lấy danh sách customers"""
     return CustomerService.get_customers(db, skip, limit, city, state)
 
 @router.get("/{customer_id}", response_model=CustomerResponse)

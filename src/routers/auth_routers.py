@@ -7,7 +7,6 @@ from services.auth_service import AuthService
 from middleware.auth import get_current_user, require_admin
 from models.staff import Staff
 
-# Nhóm các endpoint liên quan đến xác thực dưới prefix /api/auth
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=StaffResponse, status_code=status.HTTP_201_CREATED)
@@ -33,7 +32,7 @@ def login_for_access_token(
     db: Session = Depends(get_db)
 ):
     """
-    Lấy token theo chuẩn OAuth2 (dùng cho Swagger UI Authorize)
+    Lấy token theo chuẩn OAuth2 
     """
     request = LoginRequest(username=form_data.username, password=form_data.password)
     return AuthService.login(db, request)
@@ -41,7 +40,7 @@ def login_for_access_token(
 @router.get("/me", response_model=StaffResponse)
 def get_current_user_info(current_user: Staff = Depends(get_current_user)):
     """
-    Lấy thông tin user hiện tại (cần JWT Bearer token)
+    Lấy thông tin user hiện tại 
     """
     return current_user
 
@@ -55,16 +54,6 @@ def update_own_profile(
     CẬP NHẬT THÔNG TIN CÁ NHÂN (CẢ ADMIN VÀ STAFF)
     Staff có thể tự cập nhật thông tin của mình NGOẠI TRỪ email
     - first_name, last_name, phone, password có thể thay đổi
-    - Email CHỈ admin mới có quyền thay đổi (qua endpoint /api/staffs/{id})
+    - Email CHỈ admin mới có quyền thay đổi 
     """
     return AuthService.update_own_profile(db, current_user.staff_id, request)
-
-@router.get("/admin-only")
-def admin_only_route(current_user: Staff = Depends(require_admin)):
-    """
-    Endpoint ví dụ chỉ cho ADMIN (minh họa phân quyền)
-    """
-    return {
-        "message": f"Hello Admin {current_user.username}!",
-        "role": current_user.role
-    }

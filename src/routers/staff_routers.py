@@ -22,7 +22,6 @@ def create_staff(
     - username: Tên đăng nhập (duy nhất)
     - email: Email (duy nhất, bắt buộc)
     - password: Mật khẩu (>= 8 ký tự)
-    - Staff được tạo sẽ có manager_id = admin_id
     """
     return StaffService.create_staff(db, request, current_user)
 
@@ -56,10 +55,8 @@ def update_staff(
     Cập nhật thông tin staff (Chỉ admin quản lý staff đó)
     Admin có quyền:
     - Cập nhật email của staff
-    - Thay đổi role (ADMIN/STAFF)
     - Cập nhật tất cả thông tin khác (first_name, last_name, phone, active, is_active)
     
-    Lưu ý: Admin chỉ có thể sửa staff mà chính họ tạo ra (manager_id = admin_id)
     """
     return StaffService.update_staff(db, staff_id, request, current_user)
 

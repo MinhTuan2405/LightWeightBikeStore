@@ -12,7 +12,9 @@ class Staff(Base):
     phone = Column(String(15))
     active = Column(Boolean, default=True, nullable=False)
     manager_id = Column(Integer, ForeignKey("staffs.staff_id"), nullable=True)
-    # Các cột authentication (đã thêm vào Supabase)
+
+    
+    #  authentication 
     username = Column(String(50), unique=True, index=True)
     hashed_password = Column(String(255))
     role = Column(String(20), default="staff")

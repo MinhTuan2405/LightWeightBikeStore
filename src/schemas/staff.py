@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from datetime import datetime
 
-# ========== REQUEST SCHEMAS ==========
+#    REQUEST SCHEMAS   
 
 class StaffCreate(BaseModel):
     """Schema tạo staff mới (chỉ admin)"""
@@ -30,7 +30,7 @@ class StaffUpdate(BaseModel):
     role: Optional[str] = None
     is_active: Optional[bool] = None
 
-# ========== RESPONSE SCHEMAS ==========
+#    RESPONSE SCHEMAS   
 
 class StaffListResponse(BaseModel):
     staff_id: int

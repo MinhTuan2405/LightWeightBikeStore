@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# ========== REQUEST SCHEMAS ==========
+#    REQUEST SCHEMAS   
 
 class BrandCreate(BaseModel):
     brand_name: str
@@ -9,7 +9,7 @@ class BrandCreate(BaseModel):
 class BrandUpdate(BaseModel):
     brand_name: Optional[str] = None
 
-# ========== RESPONSE SCHEMAS ==========
+#    RESPONSE SCHEMAS   
 
 class BrandResponse(BaseModel):
     brand_id: int
