@@ -26,7 +26,7 @@ from schemas.statistics import (
     CustomerHighestOrder,
     HighestOrdersResponse
 )
-from middleware.auth import get_current_user, require_admin
+from middleware.auth import require_admin
 from services.statistics_service import StatisticsService
 
 router = APIRouter(prefix="/api/statistics", tags=["Statistics"])
@@ -36,7 +36,7 @@ router = APIRouter(prefix="/api/statistics", tags=["Statistics"])
 @router.get("/staffs/count", response_model=StaffCountResponse)
 def get_staff_count(
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     THỐNG KÊ SỐ LƯỢNG NHÂN VIÊN
@@ -48,7 +48,7 @@ def get_staff_count(
 @router.get("/staffs/sales", response_model=List[StaffSalesStats])
 def get_staff_sales(
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     THỐNG KÊ DOANH SỐ TẤT CẢ NHÂN VIÊN
@@ -61,7 +61,7 @@ def get_staff_sales(
 def get_staff_sales_by_id(
     staff_id: int,
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     THỐNG KÊ DOANH SỐ 1 NHÂN VIÊN
@@ -73,7 +73,7 @@ def get_staff_sales_by_month(
     staff_id: int,
     year: Optional[int] = Query(None, description="Năm cần lọc, mặc định là năm hiện tại"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ NHÂN VIÊN THEO THÁNG
@@ -86,7 +86,7 @@ def get_staff_sales_by_day(
     start_date: date = Query(..., description="Ngày bắt đầu"),
     end_date: date = Query(..., description="Ngày kết thúc"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ NHÂN VIÊN THEO NGÀY
@@ -98,7 +98,7 @@ def get_staff_sales_by_day(
 @router.get("/store/overview", response_model=StoreOverview)
 def get_store_overview(
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     TỔNG QUAN CỬA HÀNG
@@ -112,7 +112,7 @@ def get_store_sales_by_day(
     start_date: date = Query(..., description="Ngày bắt đầu"),
     end_date: date = Query(..., description="Ngày kết thúc"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ CỬA HÀNG THEO NGÀY
@@ -123,7 +123,7 @@ def get_store_sales_by_day(
 def get_store_sales_by_month(
     year: Optional[int] = Query(None, description="Năm cần lọc"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ CỬA HÀNG THEO THÁNG
@@ -134,7 +134,7 @@ def get_store_sales_by_month(
 def get_store_sales_by_quarter(
     year: Optional[int] = Query(None, description="Năm cần lọc"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ CỬA HÀNG THEO QUÝ
@@ -144,7 +144,7 @@ def get_store_sales_by_quarter(
 @router.get("/store/sales/by-year", response_model=List[StoreSalesByPeriod])
 def get_store_sales_by_year(
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DOANH SỐ CỬA HÀNG THEO NĂM
@@ -157,7 +157,7 @@ def get_store_sales_by_year(
 def get_top_selling_products(
     limit: int = Query(10, ge=1, le=100, description="Số lượng sản phẩm trả về"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     TOP SẢN PHẨM BÁN CHẠY NHẤT
@@ -172,7 +172,7 @@ def get_top_selling_products(
 def get_top_customers(
     limit: int = Query(10, ge=1, le=100, description="Số lượng khách hàng trả về"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     TOP KHÁCH HÀNG MUA NHIỀU NHẤT
@@ -185,7 +185,7 @@ def get_top_customers(
 def get_highest_orders(
     limit: int = Query(10, ge=1, le=100, description="Số lượng đơn hàng trả về"),
     db: Session = Depends(get_db),
-    current_user: Staff = Depends(get_current_user)
+    current_user: Staff = Depends(require_admin)
 ):
     """
     DANH SÁCH ĐƠN HÀNG CÓ GIÁ TRỊ CAO NHẤT
