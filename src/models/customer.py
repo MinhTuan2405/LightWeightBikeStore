@@ -12,6 +12,6 @@ class Customer(Base):
     street = Column(String(255))
     city = Column(String(50))
     state = Column(String(25))
-    zip_code = Column(String(10))
+    zip_code = Column(String(5))
 
 
