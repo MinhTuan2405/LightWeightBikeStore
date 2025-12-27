@@ -1,135 +1,457 @@
 
-# BikestoreShop
+# HỆ THỐNG BACKEND API SERVER CHO CỬA HÀNG BÁN XE ĐẠP
 
-Đây là một dự án mẫu (BikestoreShop) viết bằng Python — một API backend dành cho quản lý cửa hàng bán xe đạp.
+## 📋 Thông tin dự án
 
-## Tổng quan
+**Nhóm thực hiện:** Nhóm 08
 
-Ứng dụng cung cấp API để quản lý sản phẩm, đơn hàng, và người dùng (mô tả chi tiết các endpoint có trong mã nguồn). Dự án dùng cấu trúc thư mục đơn giản: mã nguồn nằm trong thư mục `src/`, và file tạo database cùng dữ liệu mẫu nằm trong `database/`.
+**Sinh viên thực hiện:**
 
-Phiên bản hiện tại: nguyên mẫu backend (không bao gồm frontend).
+| STT | Họ tên | MSSV | Ngành |
+|-----|--------|------|-------|
+| 1 | Nguyễn Hà Minh Tuấn | 23521718 | CNTT |
+| 2 | Trần Phan Thanh Tùng | 23521747 | CNTT |
 
-## Công nghệ chính
+## Giới thiệu
 
-- Python 3.10+ (hoặc 3.9+)
-- FastAPI (đi kèm uvicorn) — giả định từ cách chạy trong workspace
-- Cơ sở dữ liệu: có script SQL trong `database/` (tùy DB engine — sqlite/postgres/mysql)
+Đề tài xây dựng hệ thống Backend API Server cho cửa hàng bán xe đạp nhằm triển khai một **RESTful API server** để quản lý hoạt động kinh doanh cho cửa hàng xe đạp một cách hiệu quả và có hệ thống, từ việc quản lý, phân quyền cho nhân viên đến việc quản lý sản phẩm, đặt hàng và thống kê hoạt động kinh doanh của cửa hàng.
 
-> Ghi chú: Mã nguồn có thể sử dụng cấu hình trong `src/core/config.py` và kết nối DB trong `src/core/database.py`. Mở các file đó để điều chỉnh cấu hình môi trường nếu cần.
+### Đặc điểm nổi bật
 
-## Yêu cầu trước
+- **Framework:** FastAPI với kiến trúc MVC
+- **API Documentation:** Tự động tài liệu hóa thông qua Swagger UI
+- **Bảo mật:** JWT (JSON Web Tokens) cho xác thực và phân quyền
+- **Database:** PostgreSQL với SQLAlchemy ORM
+- **Migration:** Quản lý phiên bản cơ sở dữ liệu với Alembic
+- **Testing:** Tích hợp Pytest cho kiểm thử tự động
 
-- Python 3.9 hoặc mới hơn
-- Git (tuỳ nếu bạn clone)
-- Trình quản lý DB phù hợp nếu bạn không dùng SQLite (Postgres/MySQL)
+Hệ thống hoàn chỉnh với **54 endpoints**, vận hành ổn định và sẵn sàng tích hợp với các ứng dụng Frontend.
 
-## Cài đặt (Windows PowerShell)
+> **Lưu ý:** Thiết kế cơ sở dữ liệu được tham khảo từ BikeStores Sample Database, sau đó được chuẩn hóa và thiết kế lại phù hợp với yêu cầu hệ thống.
 
-1. Mở PowerShell và chuyển vào thư mục dự án:
+## Cơ sở dữ liệu
 
-	 ```powershell
-	 cd D:\WorkSpace\projects\BikestoreShop
-	 ```
+### Sơ đồ cơ sở dữ liệu
 
-2. Tạo và kích hoạt virtual environment:
+![Database Schema](image/database.png)
 
-	 ```powershell
-	 python -m venv .venv
-	 .\.venv\Scripts\Activate.ps1
-	 ```
+### Mô tả các bảng
 
-3. Cài dependencies:
+Cơ sở dữ liệu bao gồm **7 bảng chính** lưu trữ thông tin nhân viên và hoạt động kinh doanh:
 
-	 ```powershell
-	 pip install -r requirements.txt
-	 ```
+#### 1. Bảng `brands` - Thương hiệu xe đạp
 
-## Thiết lập cơ sở dữ liệu
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `brand_id` | integer | Mã thương hiệu (khóa chính) |
+| `brand_name` | varchar | Tên thương hiệu |
 
-Có sẵn file SQL tạo schema trong `database/create_database.sql` và hướng dẫn load dữ liệu trong `database/loading_data_to_database`.
+#### 2. Bảng `categories` - Danh mục sản phẩm
 
-- Với SQLite (ví dụ):
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `category_id` | integer | Mã danh mục (khóa chính) |
+| `category_name` | varchar | Tên danh mục |
 
-	```powershell
-	sqlite3 bikestore.db < .\database\create_database.sql
-	```
+#### 3. Bảng `customers` - Khách hàng
 
-- Với PostgreSQL (ví dụ):
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `customer_id` | integer | Mã khách hàng (khóa chính) |
+| `first_name` | varchar | Tên khách hàng |
+| `last_name` | varchar | Họ khách hàng |
+| `phone` | varchar | Số điện thoại |
+| `email` | varchar | Email khách hàng |
+| `street` | varchar | Địa chỉ đường |
+| `city` | varchar | Thành phố |
+| `state` | varchar | Tỉnh/Bang |
+| `zip_code` | varchar | Mã bưu điện |
 
-	```powershell
-	psql -U <username> -d <dbname> -f .\database\create_database.sql
-	```
+#### 4. Bảng `products` - Sản phẩm
 
-Sau khi tạo DB, chỉnh lại chuỗi kết nối trong `src/core/config.py` (hoặc bằng biến môi trường nếu dự án hỗ trợ).
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `product_id` | integer | Mã sản phẩm (khóa chính) |
+| `product_name` | varchar | Tên sản phẩm |
+| `brand_id` | integer | Mã thương hiệu (khóa ngoại) |
+| `category_id` | integer | Mã danh mục (khóa ngoại) |
+| `model_year` | integer | Năm sản xuất |
+| `list_price` | numeric | Giá niêm yết |
+| `stock` | integer | Số lượng tồn kho |
 
-## Chạy ứng dụng
+#### 5. Bảng `orders` - Đơn hàng
 
-Sau khi cài đặt và thiết lập DB, chạy server bằng uvicorn (từ thư mục gốc dự án):
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `order_id` | integer | Mã đơn hàng (khóa chính) |
+| `customer_id` | integer | Mã khách hàng (khóa ngoại) |
+| `order_status` | integer | Trạng thái đơn hàng |
+| `order_date` | date | Ngày đặt hàng |
+| `required_date` | date | Ngày yêu cầu giao |
+| `shipped_date` | date | Ngày giao hàng |
+| `staff_id` | integer | Mã nhân viên xử lý |
+
+#### 6. Bảng `order_items` - Chi tiết đơn hàng
+
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `order_id` | integer | Mã đơn hàng (khóa ngoại) |
+| `item_id` | integer | Số thứ tự sản phẩm |
+| `product_id` | integer | Mã sản phẩm (khóa ngoại) |
+| `quantity` | integer | Số lượng mua |
+| `list_price` | numeric | Giá tại thời điểm bán |
+| `discount` | numeric | Mức giảm giá |
+
+#### 7. Bảng `staffs` - Nhân viên
+
+| Tên cột | Kiểu dữ liệu | Ý nghĩa |
+|---------|--------------|---------|
+| `staff_id` | integer | Mã nhân viên (khóa chính) |
+| `first_name` | varchar | Tên nhân viên |
+| `last_name` | varchar | Họ nhân viên |
+| `email` | varchar | Email (duy nhất) |
+| `phone` | varchar | Số điện thoại |
+| `active` | boolean | Trạng thái làm việc |
+| `manager_id` | integer | Mã quản lý trực tiếp |
+| `username` | varchar | Tên đăng nhập |
+| `hashed_password` | varchar | Mật khẩu đã mã hóa |
+| `role` | varchar | Vai trò nhân viên |
+| `is_active` | boolean | Trạng thái tài khoản |
+| `created_at` | timestamp | Thời điểm tạo |
+| `updated_at` | timestamp | Thời điểm cập nhật |
+
+## ⚙️ Chức năng hệ thống
+
+![System Features](image/functions.png)
+
+### Xác thực và Bảo mật (5 endpoints)
+
+- Đăng ký tài khoản Admin mới
+- Đăng nhập cho toàn bộ người dùng
+- Xác thực JWT Token
+- Quản lý phiên đăng nhập
+- Phân quyền truy cập
+
+### Quản lý Nhân viên - Admin (5 endpoints)
+
+**Admin** có toàn quyền quản lý hệ thống:
+
+- Thêm, xóa, sửa thông tin nhân viên dưới quyền
+- Quản lý sản phẩm
+- Quản lý thương hiệu và danh mục
+- Xem dữ liệu thống kê kinh doanh
+- Phân quyền cho nhân viên
+
+### Chức năng Nhân viên (Staff)
+
+Nhân viên dưới quyền quản lý của Admin:
+
+- Quản lý tài khoản cá nhân (trừ email được cấp)
+- Tạo mới đơn hàng
+- Quản lý thông tin khách hàng
+
+### Quản lý Sản phẩm (5 endpoints)
+
+- Xem danh sách sản phẩm với phân trang
+- Xem chi tiết một sản phẩm
+- Thêm sản phẩm mới
+- Cập nhật thông tin sản phẩm
+- Xóa sản phẩm
+- **Bộ lọc tìm kiếm:** theo tên, thương hiệu, danh mục, giá, năm sản xuất
+
+### Quản lý Thương hiệu (5 endpoints)
+
+- Xem danh sách thương hiệu
+- Xem chi tiết thương hiệu
+- Thêm thương hiệu mới
+- Cập nhật thông tin thương hiệu
+- Xóa thương hiệu
+
+### Quản lý Danh mục (5 endpoints)
+
+- Xem danh sách danh mục sản phẩm
+- Xem chi tiết danh mục
+- Thêm danh mục mới
+- Cập nhật thông tin danh mục
+- Xóa danh mục
+
+### Quản lý Khách hàng (5 endpoints)
+
+- Xem danh sách khách hàng với phân trang
+- Xem chi tiết thông tin khách hàng
+- Tạo mới khách hàng
+- Cập nhật thông tin khách hàng
+- **Bộ lọc tìm kiếm:** theo tên, email, số điện thoại, địa chỉ
+
+### Quản lý Đơn hàng (9 endpoints)
+
+- Xem danh sách đơn hàng
+- Xem chi tiết đơn hàng (bao gồm order_items)
+- Tạo đơn hàng mới
+- Cập nhật trạng thái đơn hàng
+- Hủy/Xóa đơn hàng theo yêu cầu
+- Theo dõi tiến độ giao hàng
+- Lọc đơn hàng theo trạng thái
+- Tìm kiếm đơn hàng theo khách hàng
+- Xuất báo cáo đơn hàng
+
+### Thống kê Kinh doanh (13 endpoints)
+
+#### Thống kê Nhân viên
+
+- Số lượng nhân viên hiện tại
+- Tổng doanh số của nhân viên (số đơn hàng, số xe bán, tổng doanh thu)
+- Doanh số theo từng nhân viên
+- Doanh số nhân viên theo ngày
+- Doanh số nhân viên theo tháng
+
+#### Thống kê Cửa hàng
+
+- **Tổng quan:** Tổng doanh thu, tổng đơn hàng, tổng xe bán, tổng khách hàng
+- Doanh số theo ngày
+- Doanh số theo tháng
+- Doanh số theo quý
+- Doanh số theo năm
+
+#### Thống kê Sản phẩm và Khách hàng
+
+- Top sản phẩm bán chạy nhất
+- Đơn hàng có giá trị cao nhất
+- Khách hàng mua nhiều nhất theo giá trị đơn hàng
+
+### Kiểm tra Hệ thống (2 endpoints)
+
+- Health check endpoint
+- System status endpoint
+
+## Kiến trúc hệ thống
+
+![MVC Architecture](image/architecture.png)
+
+## Cài đặt và Triển khai
+
+### Yêu cầu hệ thống
+
+- **Python:** 3.9 hoặc mới hơn
+- **PostgreSQL:** 12+ (hoặc database tương thích)
+
+### Cài đặt trên Windows (PowerShell)
+
+#### Bước 1: Clone và di chuyển vào thư mục dự án
 
 ```powershell
-# khi virtualenv đang active
+git clone <repository-url>
+cd BikestoreShop
+```
+
+#### Bước 2: Tạo và kích hoạt Virtual Environment
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+#### Bước 3: Cài đặt Dependencies
+
+```powershell
+pip install -r src/requirements.txt
+```
+
+### Thiết lập Database
+
+#### Bước 1: Tạo Database PostgreSQL
+
+```powershell
+psql -U postgres
+CREATE DATABASE bikestore_db;
+\q
+```
+
+#### Bước 2: Chạy Migration Script
+
+```powershell
+# Tạo cấu trúc database
+psql -U postgres -d bikestore_db -f database/create_database.sql
+
+# Load dữ liệu mẫu
+psql -U postgres -d bikestore_db -f database/loading_data_to_database.sql
+```
+
+#### Bước 3: Cấu hình Database Connection
+
+Tạo file `.env` trong thư mục `src/`:
+
+```env
+# manage datasbase
+DATABASE_USERNAME=
+DATABASE_PASSWORD=
+DATABASE_HOST=
+DATABASE_PORT=
+DATABASE_DB=bikestore_db
+DATABASE_URL=postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DB}
+
+
+# JWT Security
+SECRET_KEY=your-secret-key-at-least-32-characters-long-change-this-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=
+
+```
+
+#### Bước 4: Chạy Alembic Migration
+
+```powershell
+cd src
+alembic upgrade head
+```
+
+### Chạy ứng dụng
+
+```powershell
+# Đảm bảo virtual environment đã được kích hoạt
 uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Ứng dụng sẽ sẵn sàng tại `http://127.0.0.1:8000` và tài liệu tương tác (Swagger UI) tại `http://127.0.0.1:8000/docs` (nếu dùng FastAPI).
+Ứng dụng sẽ chạy tại:
+- **API Server:** http://127.0.0.1:8000
+- **Swagger UI:** http://127.0.0.1:8000/docs
+- **ReDoc:** http://127.0.0.1:8000/redoc
 
-## Cấu trúc thư mục
+## Cấu trúc dự án
 
 ```
-README.md
-requirements.txt
-database/
-		create_database.sql
-		database_decription.md
-		loading_data_to_database
-src/
-		main.py            # entrypoint
-		controllers/       # handlers / business logic
-		core/              # cấu hình, kết nối DB
-				config.py
-				database.py
-		models/            # các model dữ liệu
-		routers/           # định nghĩa route / endpoint
+BikestoreShop/
+│
+├── README.md                          # Tài liệu dự án
+├── openai.json                        # Cấu hình OpenAI
+│
+├── database/                          # Database scripts
+│   ├── create_database.sql           # Script tạo schema
+│   ├── database_decription.md        # Mô tả database
+│   └── loading_data_to_database.sql  # Script load dữ liệu mẫu
+│
+├── image/                             # Hình ảnh tài liệu
+│   ├── database_schema.png
+│   ├── system_features.png
+│   └── mvc_architecture.png
+│
+├── src/                               # Mã nguồn chính
+│   ├── main.py                       # Entry point
+│   ├── requirements.txt              # Python dependencies
+│   ├── alembic.ini                   # Cấu hình Alembic
+│   ├── nixpacks.toml                 # Deploy config
+│   ├── Procfile                      # Process config
+│   ├── railway.json                  # Railway deploy
+│   │
+│   ├── alembic/                      # Database migrations
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions/
+│   │
+│   ├── core/                         # Core components
+│   │   ├── __init__.py
+│   │   ├── database.py              # DB connection
+│   │   └── security.py              # Security utilities
+│   │
+│   ├── middleware/                   # Middleware components
+│   │   ├── __init__.py
+│   │   └── auth.py                  # Auth middleware
+│   │
+│   ├── models/                       # SQLAlchemy models
+│   │   ├── __init__.py
+│   │   ├── brand.py
+│   │   ├── category.py
+│   │   ├── customer.py
+│   │   ├── order.py
+│   │   ├── order_item.py
+│   │   ├── product.py
+│   │   └── staff.py
+│   │
+│   ├── routers/                      # API routers
+│   │   ├── __init__.py
+│   │   ├── auth_routers.py
+│   │   ├── brand_routers.py
+│   │   ├── category_routers.py
+│   │   ├── customer_routers.py
+│   │   ├── order_routers.py
+│   │   ├── product_routers.py
+│   │   ├── staff_routers.py
+│   │   └── statistics_routers.py
+│   │
+│   ├── schemas/                      # Pydantic schemas
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── brand.py
+│   │   ├── category.py
+│   │   ├── customer.py
+│   │   ├── order.py
+│   │   ├── product.py
+│   │   ├── staff.py
+│   │   └── statistics.py
+│   │
+│   └── services/                     # Business logic
+│       ├── __init__.py
+│       ├── auth_service.py
+│       ├── brand_service.py
+│       ├── category_service.py
+│       ├── customer_service.py
+│       ├── order_service.py
+│       ├── product_service.py
+│       ├── staff_service.py
+│       └── statistics_service.py
+│
+└── tests/                             # Test suite
+    ├── conftest.py
+    ├── test_all_endpoints.py
+    └── test_auth.py
 ```
 
-## Các bước kiểm tra nhanh
+## Kiểm thử
 
-- Kiểm tra dependencies: `pip check` (sau khi cài)
-- Kiểm tra server: mở `http://127.0.0.1:8000/docs` và gọi một endpoint mẫu
+### Chạy Test Suite
 
-## Các giả định và lưu ý
+```powershell
+# Cài đặt pytest nếu chưa có
+pip install pytest pytest-asyncio httpx
 
-- README này giả định backend dùng FastAPI/uvicorn dựa trên cấu trúc thư mục và file `src/main.py` (có thể mở file để xác nhận). Nếu dự án dùng framework khác, điều chỉnh lệnh chạy tương ứng.
-- Nếu dự án sử dụng biến môi trường để cung cấp chuỗi kết nối DB, hãy đặt chúng trước khi khởi chạy (ví dụ: `DB_URL`, `DATABASE_URL`, hoặc biến do `src/core/config.py` yêu cầu).
+# Chạy toàn bộ test
+pytest tests/
 
-## Bước tiếp theo (gợi ý cải tiến)
+# Chạy test với coverage
+pytest tests/ --cov=src --cov-report=html
 
-- Thêm file `CONTRIBUTING.md` với các hướng dẫn đóng góp
-- Thêm test tự động (pytest) và workflow CI (ví dụ GitHub Actions)
-- Cập nhật `requirements.txt` với phiên bản cụ thể và thêm `pyproject.toml` nếu cần
+# Chạy test cụ thể
+pytest tests/test_auth.py
+pytest tests/test_all_endpoints.py
+```
 
-## Người đóng góp
+### Kiểm thử thủ công với Swagger UI
 
-Thông tin người phát triển/nhóm (thêm tên, email hoặc liên kết tới repo nếu cần).
+1. Truy cập http://127.0.0.1:8000/docs
+2. Sử dụng endpoint `/auth/register` để tạo tài khoản Admin
+3. Đăng nhập qua `/auth/login` để lấy JWT token
+4. Click "Authorize" và nhập token
+5. Thử nghiệm các endpoint khác
+
+## Đóng góp
+
+Mọi đóng góp đều được chào đón! Vui lòng:
+
+1. Fork repository
+2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Mở Pull Request
+
+## Liên hệ
+
+- **Nguyễn Hà Minh Tuấn** - MSSV: 23521718
+- **Trần Phan Thanh Tùng** - MSSV: 23521747
 
 ## License
 
-Ghi license dự án ở đây (ví dụ MIT) hoặc xóa phần nếu không cần.
+Dự án này được phát triển cho mục đích học tập và nghiên cứu.
 
 ---
 
-Nếu bạn muốn, tôi có thể:
-
-- Tùy biến README này (thêm các endpoint mẫu từ mã nguồn)
-- Tạo `CONTRIBUTING.md` và mẫu workflow CI
-
-Chỉ cần cho tôi biết bạn muốn thêm chi tiết nào nữa.
-
-
-| Mục                      | Bảng liên quan               | Chức năng                               |
-| ------------------------ | ---------------------------- | --------------------------------------- |
-| Product Management       | categories, brands, products | Quản lý danh mục, thương hiệu, sản phẩm |
-| Customer Management      | customers                    | Quản lý thông tin khách hàng            |
-| Store & Staff Management | stores, staffs               | Quản lý cửa hàng, nhân viên             |
-| Order Management         | orders, order_items          | Quản lý đơn hàng và chi tiết đơn hàng   |
-| Inventory Management     | stocks                       | Quản lý tồn kho theo store              |
+**Developed with ❤️ by Nhóm 08 - UIT - Kĩ thuật lập trình Python**
