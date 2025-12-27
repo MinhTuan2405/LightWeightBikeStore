@@ -1,7 +1,7 @@
 
 # HỆ THỐNG BACKEND API SERVER CHO CỬA HÀNG BÁN XE ĐẠP
 
-## 📋 Thông tin dự án
+## Thông tin
 
 **Nhóm thực hiện:** Nhóm 08
 
